@@ -1,0 +1,5 @@
+{
+    "wf.taxa_file": "mini-vertebrate.tsv",
+    "wf.objs": ["maximize-activity"],
+    "wf.sps": [true]
+}
