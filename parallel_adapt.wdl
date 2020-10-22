@@ -4,6 +4,7 @@ task format_taxa {
     
     input {
         File taxa_file
+        File all_taxa_file
     }
 
     command <<<
@@ -15,7 +16,7 @@ task format_taxa {
             ref_accs=$(echo "$taxonomy" | cut -f6)
             sptaxa="sptax_${i}_${taxid}.tsv"
             i=$((i+1))
-            awk -F'\t' -v taxid="$taxid" -v family="$family" '$1==family && $4!=taxid {print $4"\t"$5}' ~{taxa_file} > $sptaxa
+            awk -F'\t' -v taxid="$taxid" -v family="$family" '$1==family && $4!=taxid {print $4"\t"$5}' ~{all_taxa_file} > $sptaxa
         done < <(tail -n +2 ~{taxa_file})
     >>>
 
