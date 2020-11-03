@@ -1,0 +1,26 @@
+{
+	// Queue Arn (Amazon Resource Name) of the queue you want the jobs to run on.
+	"single_adapt.adapt.queueArn": "arn:aws:batch:region:userid:job-queue/name",
+	// Taxonomic ID of the design to create.
+    "single_adapt.adapt.taxid": 0,
+    // Accession number for sequences for references used by ADAPT for curation; separate multiple with commas.
+	"single_adapt.adapt.ref_accs": "reference_accession",
+	// Segment number of genome to design for; set to 'None' for unsegmented genomes.
+	"single_adapt.adapt.segment": "segment_number",
+	// Objective (either 'minimize-guides' or 'maximize-activity').
+    "single_adapt.adapt.obj": "objective_function",
+    // true to be specific against the taxa listed in specificity_taxa, false to not be specific.
+	"single_adapt.adapt.specific": false,
+    // URI for Docker ADAPT Image to use, see README for more details.
+    "single_adapt.adapt.image": "uri_to_adapt_image",
+	// Optional, only needed if specific is true. AWS S3 path to file that contains a list of taxa to be specific against. Headings should be 'family', 'genus', 'species', 'taxid', 'segment', 'refseqs', 'neighbor-count'.
+	"single_adapt.adapt.specificity_taxa": "s3://bucket/path/to/taxa/to/be/specific/against",
+	// Optional, take a sample of RAND_SAMPLE sequences from the taxa to design for.
+    "single_adapt.adapt.rand_sample": 0,
+    // Optional, set ADAPT's random seed to get consistent results across runs.
+    "single_adapt.adapt.rand_seed": 0,
+    // Optional, bucket for cloud memoization. May include path to put memo in a subfolder; do not include '\' at the end.
+    "single_adapt.adapt.bucket": "optional_bucket",
+    // Optional, sets the memory each job uses. Defaults to 2GB. If jobs fail unexpectedly, increase this.
+    "single_adapt.adapt.memory": "optional_memory_GB"
+}

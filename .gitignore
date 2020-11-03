@@ -3,4 +3,7 @@
 
 dumpfile
 
-cromwell*
+/genome_tsvs/*
+
+cromwell-executions/*
+cromwell-workflow-logs/*
