@@ -29,7 +29,7 @@ Public Subnet ID (in the form `subnet-#################`) and the VPC ID (in the
 
 2. If there are issues with running the stacks, try replacing "latest" with "v3.0.1" in any S3 file paths.
 
-3. If it still is not working, upload the contents of `/cromwell-setup` to an S3 bucket, and run the stacks using paths to your personal S3 bucket.
+3. If it still is not working, upload the contents of `/cromwell-setup/cromwell-setup.zip` to an S3 bucket, and run the stacks using paths to your personal S3 bucket.
 
 4. After the stacks have finished running, click on the core stack name, click on `Outputs`, and record the `DefaultJobQueueArn`, the `PriorityJobQueueArn`, and the `S3BucketName`. You will need these to set up your input files. Then, click on the resources stack name, click on `Outputs`, and record the `HostName`. The `HostName` will be how you connect to your Cromwell Server.
 
@@ -80,12 +80,31 @@ To send the job to your Cromwell server, you will need two or three files locall
 To design for a single taxon, use `single_adapt.wdl`. To design for multiple taxa in parallel, use `parallel_adapt.wdl`.
 
 2. a JSON file of inputs to your WDL
-To design for a single taxon, modify `single_adapt_input_template.json`. To design for multiple taxa in parallel, modify `parallel_adapt_input_template.json`.
-For `single_adapt_input_template.json`, if you would like to be specific against any taxa, you will need to upload a tab-separated value file (TSV) of those taxa to an S3 bucket. The TSV should have a header line with 'family', 'genus', 'species', 'taxid', 'segment', 'refseqs', and 'neighbor-count'.
-For `single_adapt_input_template.json`, you will need to upload a tab-separated value file (TSV) of taxa to design for to an S3 bucket. If you would like to be specific against a different set of taxa, you will need to upload another TSV of those taxa. Both TSVs should have a header line with 'family', 'genus', 'species', 'taxid', 'segment', 'refseqs', and 'neighbor-count'. 
+To design for a single taxon, modify `single_adapt_input_template.json`. Details on each of the inputs are below:
+ - single_adapt.adapt.queueArn: Queue Arn (Amazon Resource Name) of the queue you want the jobs to run on.
+ - single_adapt.adapt.taxid: Taxonomic ID of the design to create.
+ - single_adapt.adapt.ref_accs: Accession number for sequences for references used by ADAPT for curation; separate multiple with commas.
+ - single_adapt.adapt.segment: Segment number of genome to design for; set to 'None' for unsegmented genomes.
+ - single_adapt.adapt.obj: Objective (either 'minimize-guides' or 'maximize-activity').
+ - single_adapt.adapt.specific: true to be specific against the taxa listed in specificity_taxa, false to not be specific.
+ - single_adapt.adapt.image: URI for Docker ADAPT Image to use
+ - single_adapt.adapt.specificity_taxa: Optional, only needed if specific is true. AWS S3 path to file that contains a list of taxa to be specific against. Should have no headings, but be a list of taxonomic IDs in the first column and segment numbers in the second column
+ - single_adapt.adapt.rand_sample: Optional, take a sample of RAND_SAMPLE sequences from the taxa to design for.
+ - single_adapt.adapt.rand_seed: Optional, set ADAPT's random seed to get consistent results across runs.
+ - single_adapt.adapt.bucket: Optional, bucket for cloud memoization. May include path to put memo in a subfolder; do not include '\' at the end.
+ - single_adapt.adapt.memory: Optional, sets the memory each job uses. Defaults to 2GB. If jobs fail unexpectedly, increase this.
+To design for multiple taxa in parallel, modify `parallel_adapt_input_template.json`. Details on each of the inputs are below:
+ - parallel_adapt.queueArn: Queue Arn (Amazon Resource Name) of the queue you want the jobs to run on.
+ - parallel_adapt.objs: Array of objective functions to design for; can include any of {"maximize-activity", "minimize-guides"}.
+ - parallel_adapt.sps: Array; include "true" in the array to have designs made specific against any other order in the same family that is listed in ALL_TAXA_FILE; include "false" to design nonspecifically.
+ - parallel_adapt.taxa_file: AWS S3 path to a TSV file that contains a list of taxa to design for. Headings should be 'family', 'genus', 'species', 'taxid', 'segment', 'refseqs', 'neighbor-count'.
+ - parallel_adapt.format_taxa.all_taxa_file: AWS S3 path to a TSV file that contains a list of all taxa to be specific against (note: will only check for specificity within a family). Can be the same file as TAXA_FILE. Headings should be 'family', 'genus', 'species', 'taxid', 'segment', 'refseqs', 'neighbor-count'.
+ - parallel_adapt.adapt.image: URI for Docker ADAPT Image to use
+ - parallel_adapt.adapt.bucket: Optional, bucket for cloud memoization. May include path to put memo in a subfolder; do not include '/' at the end.
+ - parallel_adapt.adapt.memory: Optional, sets the memory each job uses. Defaults to 2GB. If jobs fail unexpectedly, increase this.
 
 3. a configuration file for AWS (optional, only necessary for running workflows through a Cromwell call)
-Modify anything that says `REGION`, `S3BUCKET`, and `QUEUEARN` in `aws-template.conf`. 
+Modify anything that says `REGION`, `S3BUCKET`, or `QUEUEARN` in `aws-template.conf`. 
 `REGION` should be the region in which your S3 bucket is stored and your job queues are. You should see something like `us-east-1` in the `DefaultJobQueueArn`/`PriorityJobQueueArn` you recorded in Step 4 of "Setting up Genomics Workflow Core and Cromwell Resources".
 `S3BUCKET` should be the `S3BucketName` you recorded in Step 4 of "Setting up Genomics Workflow Core and Cromwell Resources".
 `QUEUEARN` should be either the `DefaultJobQueueArn` or the `PriorityJobQueueArn` you recorded in Step 4 of "Setting up Genomics Workflow Core and Cromwell Resources". The `DefaultJobQueueArn` uses Spot instances if capacity is available, then On Demand instances; the `PriorityJobQueueArn` uses On Demand instances until a limit is reached , at which point it will use Spot instances. The `DefaultJobQueueArn` costs less, but the `PriorityJobQueueArn` will work faster.

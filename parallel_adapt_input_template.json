@@ -1,18 +1,10 @@
 {
-	// Queue Arn (Amazon Resource Name) of the queue you want the jobs to run on.
-	"parallel_adapt.queueArn": "arn:aws:batch:region:userid:job-queue/name",
-    // Array of objective functions to design for; can include any of {"maximize-activity", "minimize-guides"}.
+    "parallel_adapt.queueArn": "arn:aws:batch:region:userid:job-queue/name",
     "parallel_adapt.objs": ["maximize-activity", "minimize-guides"],
-    // Include "true" in the array to have designs made specific against any other order in the same family that is listed in ALL_TAXA_FILE; include "false" to design nonspecifically.
     "parallel_adapt.sps": [true, false],
-    // AWS S3 path to a TSV file that contains a list of taxa to design for. Headings should be 'family', 'genus', 'species', 'taxid', 'segment', 'refseqs', 'neighbor-count'.
-    "parallel_adapt.format_taxa.taxa_file": "s3://bucket/path/to/tsv",
-    // AWS S3 path to a TSV file that contains a list of all taxa to be specific against (note: will only check for specificity within a family). Can be the same file as TAXA_FILE. Headings should be 'family', 'genus', 'species', 'taxid', 'segment', 'refseqs', 'neighbor-count'.
+    "parallel_adapt.taxa_file": "s3://bucket/path/to/tsv",
     "parallel_adapt.format_taxa.all_taxa_file": "s3://bucket/path/to/tsv",
-    // URI for Docker ADAPT Image to use, see README for more details.
     "parallel_adapt.adapt.image": "uri_to_adapt_image",
-    // Optional, bucket for cloud memoization. May include path to put memo in a subfolder; do not include '\' at the end.
     "parallel_adapt.adapt.bucket": "optional_bucket",
-    // Optional, sets the memory each job uses. Defaults to 2GB. If jobs fail unexpectedly, increase this.
     "parallel_adapt.adapt.memory": "optional_memory_GB"
 }
