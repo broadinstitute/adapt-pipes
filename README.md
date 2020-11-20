@@ -35,6 +35,18 @@ Public Subnet ID (in the form `subnet-#################`) and the VPC ID (in the
 
 ## Running ADAPT on Cromwell and AWS Batch
 
+In order to do this, you will need the following values you recorded while building your server. If you didn't record them, they can be found by going to [AWS Cloud Formation](https://console.aws.amazon.com/cloudformation/home) and following the instructions in Step 4 of "Setting up Genomics Workflow Core and Cromwell Resources".
+
+1. `DefaultJobQueueArn` or `PriorityJobQueueArn`: the Batch queue to run your jobs on.
+The `DefaultJobQueueArn` uses Spot instances if capacity is available, then On Demand instances; the `PriorityJobQueueArn` uses On Demand instances until a limit is reached , at which point it will use Spot instances. The `DefaultJobQueueArn` costs less, but the `PriorityJobQueueArn` will work faster.
+If you do not have access to the Cloud Formation stack and need to find the `DefaultJobQueueArn` or `PriorityJobQueueArn`, go to the [AWS Batch Management Console](https://console.aws.amazon.com/batch/v2/home), click on "Job queues", and look for the queue with "Default" or "Priority" (and likely "Cromwell") in their names. Click on it, and record the ARN (Amazon Resource Name).
+
+2. `S3BucketName`: the S3 Bucket where your Cromwell files are
+If you do not have access to the Cloud Formation stack and need to find the `S3BucketName`, go to the [AWS S3 Management Console](https://s3.console.aws.amazon.com/s3/home) and click through the buckets until you find one with a folder called `_gwfcore`. Record this bucket's name.
+
+3. `HostName`: the URL for your server. 
+If you do not have access to the Cloud Formation stack and need to find the `HostName`, go to the [AWS EC2 Management Console](https://console.aws.amazon.com/ec2/v2/home), go to your list of instances, and find the one named "cromwell-server" (or something similar). The "Public IPv4 DNS" of this instance is your `HostName`.
+
 ### Setting up ADAPT Docker images
 You may either use our Docker images or create your own. If you would like to use our Docker images, use `194065838422.dkr.ecr.us-east-1.amazonaws.com/adaptcloud` to use cloud memoization features. Otherwise, or if you're unsure, use `194065838422.dkr.ecr.us-east-1.amazonaws.com/adapt`. 
 
@@ -81,7 +93,7 @@ To design for a single taxon, use `single_adapt.wdl`. To design for multiple tax
 
 2. a JSON file of inputs to your WDL
 To design for a single taxon, modify `single_adapt_input_template.json`. Details on each of the inputs are below:
- - single_adapt.adapt.queueArn: Queue Arn (Amazon Resource Name) of the queue you want the jobs to run on.
+ - single_adapt.adapt.queueArn: Queue ARN (Amazon Resource Name) of the queue you want the jobs to run on. This should be either the `DefaultJobQueueArn` or the `PriorityJobQueueArn`.
  - single_adapt.adapt.taxid: Taxonomic ID of the design to create.
  - single_adapt.adapt.ref_accs: Accession number for sequences for references used by ADAPT for curation; separate multiple with commas.
  - single_adapt.adapt.segment: Segment number of genome to design for; set to 'None' for unsegmented genomes.
@@ -91,30 +103,30 @@ To design for a single taxon, modify `single_adapt_input_template.json`. Details
  - single_adapt.adapt.specificity_taxa: Optional, only needed if specific is true. AWS S3 path to file that contains a list of taxa to be specific against. Should have no headings, but be a list of taxonomic IDs in the first column and segment numbers in the second column
  - single_adapt.adapt.rand_sample: Optional, take a sample of RAND_SAMPLE sequences from the taxa to design for.
  - single_adapt.adapt.rand_seed: Optional, set ADAPT's random seed to get consistent results across runs.
- - single_adapt.adapt.bucket: Optional, bucket for cloud memoization. May include path to put memo in a subfolder; do not include '\' at the end.
+ - single_adapt.adapt.bucket: Optional, S3 bucket for cloud memoization. May include path to put memo in a subfolder; do not include '\' at the end.
  - single_adapt.adapt.memory: Optional, sets the memory each job uses. Defaults to 2GB. If jobs fail unexpectedly, increase this.
 To design for multiple taxa in parallel, modify `parallel_adapt_input_template.json`. Details on each of the inputs are below:
- - parallel_adapt.queueArn: Queue Arn (Amazon Resource Name) of the queue you want the jobs to run on.
+ - parallel_adapt.queueArn: Queue ARN (Amazon Resource Name) of the queue you want the jobs to run on. This should be either the `DefaultJobQueueArn` or the `PriorityJobQueueArn`.
  - parallel_adapt.objs: Array of objective functions to design for; can include any of {"maximize-activity", "minimize-guides"}.
  - parallel_adapt.sps: Array; include "true" in the array to have designs made specific against any other order in the same family that is listed in ALL_TAXA_FILE; include "false" to design nonspecifically.
  - parallel_adapt.taxa_file: AWS S3 path to a TSV file that contains a list of taxa to design for. Headings should be 'family', 'genus', 'species', 'taxid', 'segment', 'refseqs', 'neighbor-count'.
  - parallel_adapt.format_taxa.all_taxa_file: AWS S3 path to a TSV file that contains a list of all taxa to be specific against (note: will only check for specificity within a family). Can be the same file as TAXA_FILE. Headings should be 'family', 'genus', 'species', 'taxid', 'segment', 'refseqs', 'neighbor-count'.
  - parallel_adapt.adapt.image: URI for Docker ADAPT Image to use
- - parallel_adapt.adapt.bucket: Optional, bucket for cloud memoization. May include path to put memo in a subfolder; do not include '/' at the end.
+ - parallel_adapt.adapt.bucket: Optional, S3 bucket for cloud memoization. May include path to put memo in a subfolder; do not include '/' at the end.
  - parallel_adapt.adapt.memory: Optional, sets the memory each job uses. Defaults to 2GB. If jobs fail unexpectedly, increase this.
 
 3. a configuration file for AWS (optional, only necessary for running workflows through a Cromwell call)
 Modify anything that says `REGION`, `S3BUCKET`, or `QUEUEARN` in `aws-template.conf`. 
-`REGION` should be the region in which your S3 bucket is stored and your job queues are. You should see something like `us-east-1` in the `DefaultJobQueueArn`/`PriorityJobQueueArn` you recorded in Step 4 of "Setting up Genomics Workflow Core and Cromwell Resources".
-`S3BUCKET` should be the `S3BucketName` you recorded in Step 4 of "Setting up Genomics Workflow Core and Cromwell Resources".
-`QUEUEARN` should be either the `DefaultJobQueueArn` or the `PriorityJobQueueArn` you recorded in Step 4 of "Setting up Genomics Workflow Core and Cromwell Resources". The `DefaultJobQueueArn` uses Spot instances if capacity is available, then On Demand instances; the `PriorityJobQueueArn` uses On Demand instances until a limit is reached , at which point it will use Spot instances. The `DefaultJobQueueArn` costs less, but the `PriorityJobQueueArn` will work faster.
+`REGION` should be the region in which your S3 bucket is stored and your job queues are. You should see something like `us-east-1` in the `DefaultJobQueueArn`/`PriorityJobQueueArn`; this is the region it is in.
+`S3BUCKET` should be the `S3BucketName`.
+`QUEUEARN` should be either the `DefaultJobQueueArn` or the `PriorityJobQueueArn`.
 
 ### Sending Workflow to Cromwell server
 There are three methods to run a workflow on your Cromwell Server-either through the Swagger UI, through an HTTP POST command, or through a Cromwell call. 
 
 #### Running your workflow through the Swagger UI
 
-To access the Swagger UI, go to the `HostName` URL you recorded in Step 4 of "Setting up Genomics Workflow Core and Cromwell Resources" in any web browser. 
+To access the Swagger UI, go to your `HostName` URL in any web browser. 
 
 To run your workflow, click `POST /api/workflows/{version}`, click "Try it Out", set `version` to "v1", upload your WDL workflow to `workflowSource`, upload your JSON input file to `workflowInputs`, set `workflowType` to "WDL", set `workflowTypeVersion` to "1.0", and click "Execute". Record the workflow ID outputted.
 
