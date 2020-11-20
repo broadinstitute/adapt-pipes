@@ -126,7 +126,7 @@ There are three methods to run a workflow on your Cromwell Server-either through
 
 #### Running your workflow through the Swagger UI
 
-To access the Swagger UI, go to your `HostName` URL in any web browser. 
+To access the Swagger UI, go to your `HostName` URL in a web browser. Note, it does not work in Chrome; use Firefox, Safari, Edge, or Internet Explorer instead. You may need to ignore a security warning about a self-signed certificate to access the page; to do so, click "Advanced" or "More Information" and then continue to the webpage.
 
 To run your workflow, click `POST /api/workflows/{version}`, click "Try it Out", set `version` to "v1", upload your WDL workflow to `workflowSource`, upload your JSON input file to `workflowInputs`, set `workflowType` to "WDL", set `workflowTypeVersion` to "1.0", and click "Execute". Record the workflow ID outputted.
 
