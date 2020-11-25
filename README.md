@@ -1,5 +1,8 @@
 # adapt-pipes
-Workflows to run ADAPT on AWS Batch
+
+Workflows to run ADAPT on AWS Batch.
+
+**For more information on ADAPT and on how to run it, please see the [ADAPT repository](https://github.com/broadinstitute/adapt) on GitHub.**
 
 ## Setting up Cromwell Server for AWS
 
