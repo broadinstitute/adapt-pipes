@@ -15,7 +15,7 @@ task adapt {
         Float primer_gc_hi = 0.65
         Float objfnweights_a = 0.5
         Float objfnweights_b = 0.25
-        Int bestntargets = 20
+        Int bestntargets = 10
         Float cluster_threshold = 0.3
 
         Boolean specific
@@ -28,7 +28,7 @@ task adapt {
         Int? gm = 3
         Float? gp = 0.98
         Int? softguideconstraint = 1
-        Int? hardguideconstraint = 1
+        Int? hardguideconstraint = 5
         Float? penaltystrength = 0.25
         String? maximizationalgorithm = 'random-greedy'
 

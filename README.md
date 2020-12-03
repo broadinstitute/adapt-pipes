@@ -30,9 +30,9 @@ Public Subnet ID (in the form `subnet-#################`) and the VPC ID (in the
 ### Setting up Genomics Workflow Core and Cromwell Resources
 1. Open `Installing the Genomics Workflow Core and Cromwell.pdf` in `/cromwell-setup/` and follow the instructions. Whenever it asks to use VPC subnets, use as many as you can from "Setting up a VPC".
 
-2. If there are issues with running the stacks, try replacing "latest" with "v3.0.1" in any S3 file paths.
+2. If there are issues with running the stacks, try replacing "latest" with "v3.0.2" in any S3 file paths.
 
-3. If it still is not working, upload the contents of `/cromwell-setup/cromwell-setup.zip` to an S3 bucket, and run the stacks using paths to your personal S3 bucket.
+3. If it still is not working, upload the contents of `/cromwell-setup/cromwell-setup.zip` to an S3 bucket, and run the stacks using paths to your personal S3 bucket. These have slight modifications to the templates in `Installing the Genomics Workflow Core and Cromwell.pdf` that allow AWS Batch to use the optimal instance size rather than selecting from a predefined list of instance types.
 
 4. After the stacks have finished running, click on the core stack name, click on `Outputs`, and record the `DefaultJobQueueArn`, the `PriorityJobQueueArn`, and the `S3BucketName`. You will need these to set up your input files. Then, click on the resources stack name, click on `Outputs`, and record the `HostName`. The `HostName` will be how you connect to your Cromwell Server.
 
@@ -51,7 +51,7 @@ If you do not have access to the Cloud Formation stack and need to find the `S3B
 If you do not have access to the Cloud Formation stack and need to find the `HostName`, go to the [AWS EC2 Management Console](https://console.aws.amazon.com/ec2/v2/home), go to your list of instances, and find the one named "cromwell-server" (or something similar). The "Public IPv4 DNS" of this instance is your `HostName`.
 
 ### Setting up ADAPT Docker images
-You may either use our Docker images or create your own. If you would like to use our Docker images, use `194065838422.dkr.ecr.us-east-1.amazonaws.com/adaptcloud` to use cloud memoization features. Otherwise, or if you're unsure, use `194065838422.dkr.ecr.us-east-1.amazonaws.com/adapt`. 
+You may either use our Docker images or create your own. If you would like to use our Docker images, use `quay.io/broadinstitute/adaptcloud` to use cloud memoization features. Otherwise, or if you're unsure, use `quay.io/broadinstitute/adapt`. 
 
 If you would like to build your own Docker images, do the following:
 
@@ -68,7 +68,7 @@ $ cd adapt
 $ docker build . -t adapt
 ```
 
-4. If you would like to use cloud memoization features, also run the following command:
+4. If you would like to use cloud memoization features, run the following command:
 ```
 $ docker build . -t adaptcloud -f ./cloud.Dockerfile
 ```
@@ -145,7 +145,7 @@ To run your workflow, open a terminal, and run the following command:
 ```
 $ curl -k -X POST "https://{HostName}/api/workflows/v1" \
 	-H "accept: application/json" \
-	-F "workflowSource=@{WDL Workflow}"
+	-F "workflowSource=@{WDL Workflow}" \
 	-F "workflowInputs=@{JSON Inputs}"
 ```
 
@@ -164,7 +164,7 @@ You may keep track of the status of each job produced by the workflow by referri
 
 #### Running your workflow through a Cromwell call
 
-First, you will need to download [Cromwell](https://github.com/broadinstitute/cromwell/releases/tag/53.1). You will only need to download `cromwell-53.1.jar`.
+First, you will need to download [Cromwell](https://github.com/broadinstitute/cromwell/releases/tag/54). You will only need to download `cromwell-54.jar`. You will also need to install the [AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) and add the `AWSBatchFullAccess` permissions policy to your account via [IAM](https://console.aws.amazon.com/iam/home) (click on "Users", your account name, "Add permissions", "Attach existing policies directly", "AWSBatchFullAccess", "Next: Review", and finally "Add permissions").
 
 To run your workflow, open a terminal, and run the following command:
 ```
