@@ -48,7 +48,7 @@ task adapt {
     }
 
     Boolean fasta_cmd = defined(fasta)
-    String args_base = "-gl ~{gl} -pl ~{pl} -pm ~{pm} -pp ~{pp} --primer-gc-content-bounds ~{primer_gc_lo} ~{primer_gc_hi} --max-primers-at-site ~{max_primers_at_site} --max-target-length ~{max_target_length} --obj-fn-weights ~{objfnweights_a} ~{objfnweights_b} --best-n-targets ~{bestntargets} --predict-activity-model-path $WORK_DIR/models/classify//model-51373185 $WORK_DIR/models/regress/model-f8b6fd5d --mafft-path $MAFFT_PATH --cluster-threshold ~{cluster_threshold}"
+    String args_base = "-gl ~{gl} -pl ~{pl} -pm ~{pm} -pp ~{pp} --primer-gc-content-bounds ~{primer_gc_lo} ~{primer_gc_hi} --max-primers-at-site ~{max_primers_at_site} --max-target-length ~{max_target_length} --obj-fn-weights ~{objfnweights_a} ~{objfnweights_b} --best-n-targets ~{bestntargets} --predict-activity-model-path $WORK_DIR/models/classify/model-51373185 $WORK_DIR/models/regress/model-f8b6fd5d"
     String args_specificity = " --id-m ~{idm} --id-frac ~{idfrac} --id-method shard --specific-against-taxa "
     String args_obj = if "~{obj}" == "minimize-guides" then " --obj minimize-guides -gm ~{gm} -gp ~{gp}" else if "~{obj}" == "maximize-activity" then " --obj ~{obj} --soft-guide-constraint ~{soft_guide_constraint} --hard-guide-constraint ~{hard_guide_constraint} --penalty-strength ~{penalty_strength} --maximization-algorithm ~{maximization_algorithm}" else ""
     String args_flank3 = if require_flanking3_exists then " --require-flanking3 ~{require_flanking3}" else ""
@@ -71,9 +71,9 @@ task adapt {
         else
             if ~{specific}
             then
-                design.py complete-targets auto-from-args ~{taxid} ~{segment} guides.tsv ~{args_base}~{args_specificity}~{specificity_taxa}~{args_obj}~{args_flank3}~{args_flank5}~{args_influenza}~{args_memo}~{args_refs}~{args_rand}~{args_seed}
+                design.py complete-targets auto-from-args ~{taxid} ~{segment} guides.tsv --mafft-path $MAFFT_PATH --cluster-threshold ~{cluster_threshold} ~{args_base}~{args_specificity}~{specificity_taxa}~{args_obj}~{args_flank3}~{args_flank5}~{args_influenza}~{args_memo}~{args_refs}~{args_rand}~{args_seed}
             else
-                design.py complete-targets auto-from-args ~{taxid} ~{segment} guides.tsv ~{args_base}~{args_obj}~{args_flank3}~{args_flank5}~{args_influenza}~{args_memo}~{args_refs}~{args_rand}~{args_seed}
+                design.py complete-targets auto-from-args ~{taxid} ~{segment} guides.tsv --mafft-path $MAFFT_PATH --cluster-threshold ~{cluster_threshold} ~{args_base}~{args_obj}~{args_flank3}~{args_flank5}~{args_influenza}~{args_memo}~{args_refs}~{args_rand}~{args_seed}
             fi
         fi
     >>>
@@ -82,7 +82,7 @@ task adapt {
         docker: "~{image}"
         queueArn: "~{queueArn}"
         memory: "~{memory}"
-        maxRetries: 1
+        maxRetries: 0
     }
 
     output {
