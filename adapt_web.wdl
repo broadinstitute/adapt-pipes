@@ -52,7 +52,7 @@ task adapt {
     String args_base = " -gl ~{gl} -pl ~{pl} -pm ~{pm} -pp ~{pp} --primer-gc-content-bounds ~{primer_gc_lo} ~{primer_gc_hi} --max-primers-at-site ~{max_primers_at_site} --max-target-length ~{max_target_length} --obj-fn-weights ~{objfnweights_a} ~{objfnweights_b} --best-n-targets ~{bestntargets} --predict-activity-model-path $WORK_DIR/models/classify/model-51373185 $WORK_DIR/models/regress/model-f8b6fd5d"
     Boolean sp_taxa = defined(specificity_taxa)
     Boolean sp_fasta = defined(specificity_fasta)
-    String args_specificity = if sp_taxa or sp_fasta then " --id-m ~{idm} --id-frac ~{idfrac} --id-method shard" else ""
+    String args_specificity = if (sp_taxa || sp_fasta) then " --id-m ~{idm} --id-frac ~{idfrac} --id-method shard" else ""
     String args_obj = if "~{obj}" == "minimize-guides" then " --obj minimize-guides -gm ~{gm} -gp ~{gp}" else if "~{obj}" == "maximize-activity" then " --obj ~{obj} --soft-guide-constraint ~{soft_guide_constraint} --hard-guide-constraint ~{hard_guide_constraint} --penalty-strength ~{penalty_strength} --maximization-algorithm ~{maximization_algorithm}" else ""
     String args_flank3 = if require_flanking3_exists then " --require-flanking3 ~{require_flanking3}" else ""
     String args_flank5 = if defined(require_flanking5) then " --require-flanking5 ~{require_flanking5}" else ""
