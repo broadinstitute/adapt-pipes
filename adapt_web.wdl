@@ -34,7 +34,6 @@ task adapt {
         Float penalty_strength = 0.25
         String maximization_algorithm = 'random-greedy'
 
-        Boolean require_flanking3_exists = true
         String require_flanking3 = "H"
         String? require_flanking5
         String? bucket
@@ -54,7 +53,7 @@ task adapt {
     Boolean sp_fasta = defined(specificity_fasta)
     String args_specificity = if (sp_taxa || sp_fasta) then " --id-m ~{idm} --id-frac ~{idfrac} --id-method shard" else ""
     String args_obj = if "~{obj}" == "minimize-guides" then " --obj minimize-guides -gm ~{gm} -gp ~{gp}" else if "~{obj}" == "maximize-activity" then " --obj ~{obj} --soft-guide-constraint ~{soft_guide_constraint} --hard-guide-constraint ~{hard_guide_constraint} --penalty-strength ~{penalty_strength} --maximization-algorithm ~{maximization_algorithm}" else ""
-    String args_flank3 = if require_flanking3_exists then " --require-flanking3 ~{require_flanking3}" else ""
+    String args_flank3 = if (require_flanking3 != "") then " --require-flanking3 ~{require_flanking3}" else ""
     String args_flank5 = if defined(require_flanking5) then " --require-flanking5 ~{require_flanking5}" else ""
     String args_influenza = if "~{taxid}" == "11320" || "~{taxid}" == "11520" || "~{taxid}" == "11552"  then " --prep-influenza" else ""
     String args_refs = if defined(ref_accs) then " --ref-accs ~{ref_accs}" else ""
