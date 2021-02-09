@@ -72,12 +72,14 @@ task adapt {
                     design.py complete-targets fasta ~{sep=" " fasta} ~{args} --specific-against-taxa ~{specificity_taxa} --specific-against-fasta ~{sep=" " specificity_fasta}
                 else
                     design.py complete-targets fasta ~{sep=" " fasta} ~{args} --specific-against-taxa ~{specificity_taxa}
+                fi
             else
                 if ~{sp_fasta}
                 then
                     design.py complete-targets fasta ~{sep=" " fasta} ~{args} --specific-against-fasta ~{sep=" " specificity_fasta}
                 else
                     design.py complete-targets fasta ~{sep=" " fasta} ~{args}
+                fi
             fi
         else
             if ~{sp_taxa}
@@ -87,12 +89,14 @@ task adapt {
                     design.py complete-targets auto-from-args ~{args} --specific-against-taxa ~{specificity_taxa} --specific-against-fasta ~{sep=" " specificity_fasta}
                 else
                     design.py complete-targets auto-from-args ~{args} --specific-against-taxa ~{specificity_taxa}
+                fi
             else
                 if ~{sp_fasta}
                 then
                     design.py complete-targets auto-from-args ~{args} --specific-against-taxa ~{specificity_taxa} --specific-against-fasta ~{sep=" " specificity_fasta}
                 else
                     design.py complete-targets auto-from-args ~{args} --specific-against-taxa ~{specificity_taxa}
+                fi
             fi
         fi
     >>>
