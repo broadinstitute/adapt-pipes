@@ -93,9 +93,9 @@ task adapt {
             else
                 if ~{sp_fasta}
                 then
-                    design.py complete-targets auto-from-args ~{args} --specific-against-taxa ~{specificity_taxa} --specific-against-fasta ~{sep=" " specificity_fasta}
+                    design.py complete-targets auto-from-args ~{args} --specific-against-fasta ~{sep=" " specificity_fasta}
                 else
-                    design.py complete-targets auto-from-args ~{args} --specific-against-taxa ~{specificity_taxa}
+                    design.py complete-targets auto-from-args ~{args}
                 fi
             fi
         fi
