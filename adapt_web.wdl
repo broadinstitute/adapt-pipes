@@ -4,10 +4,10 @@ task adapt {
 
     input {
         Int? taxid
-        String? segment
         String? ref_accs
         Array[File]? fasta
         String obj
+        String segment = 'None'
         Int gl = 28
         Int pl = 30
         Int pm = 3
