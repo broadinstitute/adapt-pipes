@@ -175,6 +175,6 @@ workflow parallel_adapt {
 
     output {
         Array[Array[Array[Array[File]]]] guides = adapt.guides
-        File taxa_file = write_objects(taxa)
+        File output_taxa_file = write_objects(taxa)
     }
 }
