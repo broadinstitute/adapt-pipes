@@ -77,7 +77,7 @@ task adapt {
     String args_specificity = "--id-m ~{idm} --id-frac ~{idfrac} --id-method shard --specific-against-taxa"
     String args_obj = if "~{obj}" == "minimize-guides" then "--obj minimize-guides -gm ~{gm} -gp ~{gp} --require-flanking3 H" else if "~{obj}" == "maximize-activity" then "--obj ~{obj} --soft-guide-constraint ~{soft_guide_constraint} --hard-guide-constraint ~{hard_guide_constraint} --penalty-strength ~{penalty_strength} --maximization-algorithm ~{maximization_algorithm}" else ""
     String args_influenza = if "~{taxid}" == "11320" || "~{taxid}" == "11520" || "~{taxid}" == "11552"  then " --prep-influenza" else ""
-    String args_refs = if defined(ref_accs) then "--ref-accs ~{ref_accs}" else ""
+    String args_refs = if defined(ref_accs) then " --ref-accs ~{ref_accs}" else ""
     String args_memo = if defined(bucket) then " --prep-memoize-dir s3://~{bucket}/memo" else ""
     String args_rand = if defined(rand_sample) then " --sample-seqs ~{rand_sample}" else ""
     String args_seed = if defined(rand_seed) then " --seed ~{rand_seed}" else ""
