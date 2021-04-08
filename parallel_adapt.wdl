@@ -85,9 +85,9 @@ task adapt {
     command <<<
         if ~{specific}
         then
-            ~{base_cmd} ~{args_specificity} ~{specificity_taxa} ~{args_obj}~{args_influenza}~{args_memo}~{args_rand}~{args_seed}
+            ~{base_cmd} ~{args_specificity} ~{specificity_taxa} ~{args_obj}~{args_influenza}~{args_refs}~{args_memo}~{args_rand}~{args_seed}
         else
-            ~{base_cmd} ~{args_obj}~{args_influenza}~{args_memo}~{args_rand}~{args_seed}
+            ~{base_cmd} ~{args_obj}~{args_influenza}~{args_refs}~{args_memo}~{args_rand}~{args_seed}
         fi
     >>>
 
