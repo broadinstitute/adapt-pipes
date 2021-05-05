@@ -41,6 +41,8 @@ task adapt {
         Int? rand_sample
         Int? rand_seed
 
+        Boolean write_aln = false
+
         String image
         String queueArn
         String memory = "2GB"
@@ -60,7 +62,8 @@ task adapt {
     String args_memo = if defined(bucket) then " --prep-memoize-dir s3://~{bucket}/memo" else ""
     String args_rand = if defined(rand_sample) then " --sample-seqs ~{rand_sample}" else ""
     String args_seed = if defined(rand_seed) then " --seed ~{rand_seed}" else ""
-    String args = "~{args_in}~{args_base}~{args_specificity}~{args_obj}~{args_flank3}~{args_flank5}~{args_influenza}~{args_refs}~{args_memo}~{args_rand}~{args_seed}"
+    String args_aln = if write_aln then " --write-input-aln alignment" else ""
+    String args = "~{args_in}~{args_base}~{args_specificity}~{args_obj}~{args_flank3}~{args_flank5}~{args_influenza}~{args_refs}~{args_memo}~{args_rand}~{args_seed}~{args_aln}"
 
     command <<<
         if ~{fasta_cmd}
@@ -110,6 +113,7 @@ task adapt {
 
     output {
         Array[File] guides = glob("*.tsv*")
+        Array[File] alns = glob("alignment.*")
         File stats = stderr()
     }
 }
@@ -119,5 +123,6 @@ workflow adapt_web {
 
     output {
         Array[File] guides = adapt.guides
+        Array[File] alns = adapt.alns
     }
 }
