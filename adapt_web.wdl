@@ -50,7 +50,7 @@ task adapt {
 
     Boolean fasta_cmd = defined(fasta)
     String args_in = if fasta_cmd then "-o guides.tsv" else "~{taxid} ~{segment} guides.tsv --mafft-path $MAFFT_PATH --cluster-threshold ~{cluster_threshold}"
-    String args_base = " -gl ~{gl} -pl ~{pl} -pm ~{pm} -pp ~{pp} --primer-gc-content-bounds ~{primer_gc_lo} ~{primer_gc_hi} --max-primers-at-site ~{max_primers_at_site} --max-target-length ~{max_target_length} --obj-fn-weights ~{objfnweights_a} ~{objfnweights_b} --best-n-targets ~{bestntargets} --predict-activity-model-path $WORK_DIR/models/classify/model-51373185 $WORK_DIR/models/regress/model-f8b6fd5d"
+    String args_base = " -gl ~{gl} -pl ~{pl} -pm ~{pm} -pp ~{pp} --primer-gc-content-bounds ~{primer_gc_lo} ~{primer_gc_hi} --max-primers-at-site ~{max_primers_at_site} --max-target-length ~{max_target_length} --obj-fn-weights ~{objfnweights_a} ~{objfnweights_b} --best-n-targets ~{bestntargets} --predict-cas13a-activity-model"
     Boolean sp_taxa = defined(specificity_taxa)
     Boolean sp_fasta = defined(specificity_fasta)
     String args_specificity = if (sp_taxa || sp_fasta) then " --id-m ~{idm} --id-frac ~{idfrac} --id-method shard" else ""
