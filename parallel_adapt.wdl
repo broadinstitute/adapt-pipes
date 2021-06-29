@@ -71,6 +71,8 @@ task adapt {
         String image
         String queueArn
         String memory = "2GB"
+
+        Boolean write_aln = true
     }
 
     String sp_str = if specific then "sp" else "nonsp"
@@ -82,14 +84,15 @@ task adapt {
     String args_memo = if defined(bucket) then " --prep-memoize-dir s3://~{bucket}/memo" else ""
     String args_rand = if defined(rand_sample) then " --sample-seqs ~{rand_sample}" else ""
     String args_seed = if defined(rand_seed) then " --seed ~{rand_seed}" else ""
+    String args_aln = if write_aln then " --write-input-aln alignment" else ""
 
     command <<<
         if ~{specific}
         then
-            ~{base_cmd} ~{args_specificity} ~{specificity_taxa} ~{args_obj}~{args_influenza}~{args_refs}~{args_memo}~{args_rand}~{args_seed}
+            ~{base_cmd} ~{args_specificity} ~{specificity_taxa} ~{args_obj}~{args_influenza}~{args_refs}~{args_memo}~{args_rand}~{args_seed}~{args_aln}
         else
-            ~{base_cmd} ~{args_obj}~{args_influenza}~{args_refs}~{args_memo}~{args_rand}~{args_seed}
-        fi || echo "objective-value\ttarget-start\ttarget-end\ttarget-length\tleft-primer-start\tleft-primer-num-primers\tleft-primer-frac-bound\tleft-primer-target-sequences\tright-primer-start\tright-primer-num-primers\tright-primer-frac-bound\tright-primer-target-sequences\tnum-guides\ttotal-frac-bound-by-guides\tguide-set-expected-activity\tguide-set-median-activity\tguide-set-5th-pctile-activity\tguide-expected-activities\tguide-target-sequences\tguide-target-sequence-positions\n" > failed.tsv.0
+            ~{base_cmd} ~{args_obj}~{args_influenza}~{args_refs}~{args_memo}~{args_rand}~{args_seed}~{args_aln}
+        fi
     >>>
 
     runtime {
@@ -103,6 +106,7 @@ task adapt {
 
     output {
         Array[File] guides = glob("*.tsv*")
+        Array[File] alns = glob("alignment.*")
     }
 }
 
@@ -119,6 +123,7 @@ workflow parallel_adapt {
         File nonsp_mem_file = ''
         Array[String] objs = ["maximize-activity", "minimize-guides"]
         Array[Boolean] sps = [true, false]
+        Array[Int]? tax_to_do
     }
 
     parameter_meta {
@@ -136,10 +141,11 @@ workflow parallel_adapt {
             queueArn = queueArn
     }
     Array[Object] taxa = read_objects(taxa_file)
+    Array[Int] which_tax_to_do = select_first([tax_to_do, range(length(taxa))])
     scatter(sp in sps) {
         Map[String, String] mem_map = if (sp == true) then read_map(sp_mem_file) else read_map(nonsp_mem_file)
         scatter(obj in objs) {
-            scatter(i in range(length(taxa))) {
+            scatter(i in which_tax_to_do) {
                 Object taxon = taxa[i]
                 call adapt {
                     input:
@@ -178,6 +184,7 @@ workflow parallel_adapt {
 
     output {
         Array[Array[Array[Array[File]]]] guides = adapt.guides
+        Array[Array[Array[Array[File]]]] alns = adapt.alns
         File output_taxa_file = write_objects(taxa)
     }
 }
