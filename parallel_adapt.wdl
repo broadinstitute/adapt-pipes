@@ -76,7 +76,7 @@ task adapt {
     }
 
     String sp_str = if specific then "sp" else "nonsp"
-    String base_cmd = "design.py complete-targets auto-from-args ~{taxid} ~{segment} ~{taxid}_~{sp_str}_guides.tsv -gl ~{gl} -pl ~{pl} -pm ~{pm} -pp ~{pp} --primer-gc-content-bounds ~{primer_gc_lo} ~{primer_gc_hi} --max-primers-at-site ~{max_primers_at_site} --max-target-length ~{max_target_length} --obj-fn-weights ~{objfnweights_a} ~{objfnweights_b} --best-n-targets ~{bestntargets} --predict-cas13a-activity-model --mafft-path $MAFFT_PATH --cluster-threshold ~{cluster_threshold}"
+    String base_cmd = "design.py complete-targets auto-from-args ~{taxid} '~{segment}' ~{taxid}_~{sp_str}_guides.tsv -gl ~{gl} -pl ~{pl} -pm ~{pm} -pp ~{pp} --primer-gc-content-bounds ~{primer_gc_lo} ~{primer_gc_hi} --max-primers-at-site ~{max_primers_at_site} --max-target-length ~{max_target_length} --obj-fn-weights ~{objfnweights_a} ~{objfnweights_b} --best-n-targets ~{bestntargets} --predict-cas13a-activity-model --mafft-path $MAFFT_PATH --cluster-threshold ~{cluster_threshold}"
     String args_specificity = "--id-m ~{idm} --id-frac ~{idfrac} --id-method shard --specific-against-taxa"
     String args_obj = if "~{obj}" == "minimize-guides" then "--obj minimize-guides -gm ~{gm} -gp ~{gp} --require-flanking3 H" else if "~{obj}" == "maximize-activity" then "--obj ~{obj} --soft-guide-constraint ~{soft_guide_constraint} --hard-guide-constraint ~{hard_guide_constraint} --penalty-strength ~{penalty_strength} --maximization-algorithm ~{maximization_algorithm}" else ""
     String args_influenza = if "~{taxid}" == "11320" || "~{taxid}" == "11520" || "~{taxid}" == "11552"  then " --prep-influenza" else ""
@@ -128,7 +128,7 @@ workflow parallel_adapt {
 
     parameter_meta {
         queueArn: "Amazon Resource Number for queue to use"
-        taxa_file: "TSV with columns for the inputs for ADAPT. Set to 'default' for the default value"
+        taxa_file: "TSV with columns for the inputs for ADAPT. Use 'default' in column for the default value for that column."
         sp_mem_file: "Two column TSV with families in the first column and memory to allocate for specific runs in the second column."
         nonsp_mem_file: "Two column TSV with families in the first column and memory to allocate for nonspecific runs in the second column."
         objs: "List of objectives to use (only 'maximize-activity' or 'minimize-guides' allowed)"
