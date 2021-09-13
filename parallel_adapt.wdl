@@ -104,7 +104,7 @@ task adapt {
 
     output {
         Array[File] guides = glob("*guides.*.tsv")
-        Array[File] alns = glob("*alignment.*.tsv")
+        Array[File] alns = glob("*alignment.*.fasta")
         Array[File] anns = glob("*annotation.*.tsv")
     }
 }
