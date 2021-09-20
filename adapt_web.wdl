@@ -43,7 +43,7 @@ task adapt {
 
         Boolean write_aln = false
 
-        String image
+        String image = "quay.io/broadinstitute/adaptcloud"
         String queueArn
         String memory = "2GB"
     }
@@ -62,7 +62,7 @@ task adapt {
     String args_memo = if defined(bucket) then " --prep-memoize-dir s3://~{bucket}/memo" else ""
     String args_rand = if defined(rand_sample) then " --sample-seqs ~{rand_sample}" else ""
     String args_seed = if defined(rand_seed) then " --seed ~{rand_seed}" else ""
-    String args_aln = if write_aln then " --write-input-aln alignment" else ""
+    String args_aln = if (write_aln && !fasta_cmd) then " --write-input-aln alignment" else ""
     String args = "~{args_in}~{args_base}~{args_specificity}~{args_obj}~{args_flank3}~{args_flank5}~{args_influenza}~{args_refs}~{args_memo}~{args_rand}~{args_seed}~{args_aln}"
 
     command <<<
