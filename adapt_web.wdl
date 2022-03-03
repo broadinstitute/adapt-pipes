@@ -6,6 +6,8 @@ task adapt {
         Int? taxid
         String? ref_accs
         Array[File]? fasta
+        Boolean unaligned_fasta = false
+
         String obj
         String segment = 'None'
         Int gl = 28
@@ -62,7 +64,7 @@ task adapt {
     String args_memo = if defined(bucket) then " --prep-memoize-dir s3://~{bucket}/memo" else ""
     String args_rand = if defined(rand_sample) then " --sample-seqs ~{rand_sample}" else ""
     String args_seed = if defined(rand_seed) then " --seed ~{rand_seed}" else ""
-    String args_aln = if (write_aln && !fasta_cmd) then " --write-input-aln alignment" else ""
+    String args_aln = if (write_aln && !(fasta_cmd && !unaligned_fasta)) then " --write-input-aln alignment" else ""
     String args = "~{args_in}~{args_base}~{args_specificity}~{args_obj}~{args_flank3}~{args_flank5}~{args_influenza}~{args_refs}~{args_memo}~{args_rand}~{args_seed}~{args_aln}"
 
     command <<<
@@ -72,16 +74,36 @@ task adapt {
             then
                 if ~{sp_fasta}
                 then
-                    design.py complete-targets fasta ~{sep=" " fasta} ~{args} --specific-against-taxa ~{specificity_taxa} --specific-against-fasta ~{sep=" " specificity_fasta}
+                    if ~{unaligned_fasta}
+                    then
+                        design.py complete-targets fasta ~{sep=" " fasta} ~{args} --unaligned --specific-against-taxa ~{specificity_taxa} --specific-against-fasta ~{sep=" " specificity_fasta}
+                    else
+                        design.py complete-targets fasta ~{sep=" " fasta} ~{args} --specific-against-taxa ~{specificity_taxa} --specific-against-fasta ~{sep=" " specificity_fasta}
+                    fi
                 else
-                    design.py complete-targets fasta ~{sep=" " fasta} ~{args} --specific-against-taxa ~{specificity_taxa}
+                    if ~{unaligned_fasta}
+                    then
+                        design.py complete-targets fasta ~{sep=" " fasta} ~{args} --unaligned --specific-against-taxa ~{specificity_taxa}
+                    else
+                        design.py complete-targets fasta ~{sep=" " fasta} ~{args} --specific-against-taxa ~{specificity_taxa}
+                    fi
                 fi
             else
                 if ~{sp_fasta}
                 then
-                    design.py complete-targets fasta ~{sep=" " fasta} ~{args} --specific-against-fasta ~{sep=" " specificity_fasta}
+                    if ~{unaligned_fasta}
+                    then
+                        design.py complete-targets fasta ~{sep=" " fasta} ~{args} --unaligned --specific-against-fasta ~{sep=" " specificity_fasta}
+                    else
+                        design.py complete-targets fasta ~{sep=" " fasta} ~{args} --specific-against-fasta ~{sep=" " specificity_fasta}
+                    fi
                 else
-                    design.py complete-targets fasta ~{sep=" " fasta} ~{args}
+                    if ~{unaligned_fasta}
+                    then
+                        design.py complete-targets fasta ~{sep=" " fasta} ~{args} --unaligned
+                    else
+                        design.py complete-targets fasta ~{sep=" " fasta} ~{args}
+                    fi
                 fi
             fi
         else
